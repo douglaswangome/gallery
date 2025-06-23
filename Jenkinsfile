@@ -36,6 +36,8 @@ pipeline {
         	slackMessageColor = '#ff0000' // Red
         	slackMessageText = "Build failed: <${env.BUILD_URL}|${env.JOB_NAME} #${env.BUILD_NUMBER}>"
         }
+
+        slackSend(color: slackMessageColor, message: slackMessageText)
 			}
 		}
 	}
