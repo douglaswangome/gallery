@@ -6,3 +6,9 @@
 
 # Build 3
 - I have changed the file name to Jenkinsfile
+- The build failed
+
+# Build 4
+- No changes made
+- The build was unsuccessful
+- Installed the Github plugin
