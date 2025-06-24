@@ -6,6 +6,7 @@ pipeline {
 	}
 
 	environment {
+		RENDER_SERVICE_ID = "srv-d1cm5h7fte5s738052jg"
 		RENDER_BASE_URL = "https://gallery-45sh.onrender.com/"
 	}
 
@@ -19,6 +20,18 @@ pipeline {
 		stage("Test") {
 			steps {
 				sh "npm test"
+			}
+		}
+
+		stage("Deploy to Render") {
+			steps {
+				withCredentials([string(credentialsId: "MoringaDevOps10-IP1-Render", variable: 'RENDER_API_KEY')]) {
+					sh """
+	          curl -X POST https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys \
+	          -H "Accept: application/json" \
+	          -H "Content-Type: application/json" \
+	          -H "Authorization: Bearer ${RENDER_API_KEY}"
+          """
 			}
 		}
 	}
