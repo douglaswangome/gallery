@@ -27,11 +27,12 @@ pipeline {
 			steps {
 				withCredentials([string(credentialsId: "MoringaDevOps10-IP1-Render", variable: 'RENDER_API_KEY')]) {
 					sh """
-	          curl -X POST https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys \
-	          -H "Accept: application/json" \
-	          -H "Content-Type: application/json" \
-	          -H "Authorization: Bearer ${RENDER_API_KEY}"
+            curl -X POST https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${RENDER_API_KEY}"
           """
+				}
 			}
 		}
 	}
@@ -53,4 +54,5 @@ pipeline {
         slackSend(color: slackMessageColor, message: slackMessageText)
 			}
 		}
+	}
 }
