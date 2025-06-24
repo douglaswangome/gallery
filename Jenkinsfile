@@ -53,6 +53,4 @@ pipeline {
         slackSend(color: slackMessageColor, message: slackMessageText)
 			}
 		}
-	}
-
 }
