@@ -72,11 +72,12 @@ pipeline {
 
 	post {
 		always {
-			success {
-				echo "Build completed successfully."
-			}
-			failure {
-				echo "Build failed. Please check the logs for details."
+			script {
+				if (currentBuild.result == null || currentBuild.result == 'SUCCESS') {
+					currentBuild.result = 'SUCCESS'
+				} else {
+					currentBuild.result = 'FAILURE'
+				}
 			}
 		}
 	}
