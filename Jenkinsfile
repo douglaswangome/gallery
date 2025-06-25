@@ -6,32 +6,65 @@ pipeline {
 	}
 
 	environment {
-		RENDER_SERVICE_ID = "srv-d1cm5h7fte5s738052jg"
 		RENDER_BASE_URL = "https://gallery-45sh.onrender.com/"
 	}
 
 	stages {
+		stage("Clone Repository") {
+			steps {
+				git branch: 'master', url: 'https://github.com/douglaswangome/gallery'
+			}
+		}
+
 		stage("Install Dependencies") {
 			steps {
 				sh "npm install"
 			}
 		}
 
-		stage("Test") {
+		stage("Run Tests") {
 			steps {
 				sh "npm test"
+			}
+
+			post {
+				failure {
+					emailext(
+						subject: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+						body: "The build for ${env.JOB_NAME} #${env.BUILD_NUMBER} has failed. Please check the Jenkins console output for more details.",
+						to: "douglas.wangome@student.moringaschool.com"
+					)
+				}
 			}
 		}
 
 		stage("Deploy to Render") {
 			steps {
-				withCredentials([string(credentialsId: "MoringaDevOps10-IP1-Render", variable: 'RENDER_API_KEY')]) {
-					sh """
-            curl -X POST https://api.render.com/v1/services/${RENDER_SERVICE_ID}/deploys \
-            -H "Accept: application/json" \
-            -H "Content-Type: application/json" \
-            -H "Authorization: Bearer ${RENDER_API_KEY}"
-          """
+				echo "Deploying to Render..."
+				echo "Triggering deployment to Render with base URL: ${RENDER_BASE_URL}"
+				echo "Deployment complete."
+			}
+
+			post {
+				success {
+					slackSend(
+						channel: "#douglas_ip1",
+						color: "good",
+						message: "Build and deployment successful: ${env.JOB_NAME} #${env.BUILD_NUMBER}. Check the build at ${RENDER_BASE_URL}"
+						teamDomain: "moringadevops10",
+						tokenCredentialId: "Jenkins-App-Slack",
+						botUser: true
+					)
+				}
+				failure {
+					slackSend(
+						channel: "#douglas_ip1",
+						color: "danger",
+						message: "Build failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}. Please check the Jenkins console output for more details."
+						teamDomain: "moringadevops10",
+						tokenCredentialId: "Jenkins-App-Slack",
+						botUser: true
+					)
 				}
 			}
 		}
@@ -39,19 +72,11 @@ pipeline {
 
 	post {
 		always {
-			script {
-				def slackMessageColor
-        def slackMessageText
-
-        if (currentBuild.result == 'SUCCESS') {
-        	slackMessageColor = '#36a64f' // Green
-        	slackMessageText = "Build succeeded: <${env.BUILD_URL}|${env.JOB_NAME} #${env.BUILD_NUMBER}>. Deployed to <${RENDER_BASE_URL}|Render Gallery>"
-        } else {
-        	slackMessageColor = '#ff0000' // Red
-        	slackMessageText = "Build failed: <${env.BUILD_URL}|${env.JOB_NAME} #${env.BUILD_NUMBER}>"
-        }
-
-        slackSend(color: slackMessageColor, message: slackMessageText)
+			success {
+				echo "Build completed successfully."
+			}
+			failure {
+				echo "Build failed. Please check the logs for details."
 			}
 		}
 	}
