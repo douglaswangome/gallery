@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -13,12 +14,13 @@ const app = express();
 
 // connecting the database
 
-const MONGODB_URI = process.env.MONGODB_URI || config.mongoURI[app.settings.env]
+const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI_CENSORED = config.mongoURI[app.settings.env];
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true  },(err)=>{
     if (err) {
         console.log(err)
     }else{
-        console.log(`Connected to Database: ${MONGODB_URI}`)
+        console.log(`Connected to Database: ${MONGODB_URI_CENSORED}`)
     }
 });
 
