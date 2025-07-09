@@ -6,6 +6,7 @@ pipeline {
   }
 
   environment {
+    MONGODB_URI = credentials("Week3IP1-MongoDB")
     RENDER_BASE_URL = "https://gallery-45sh.onrender.com/"
   }
 
